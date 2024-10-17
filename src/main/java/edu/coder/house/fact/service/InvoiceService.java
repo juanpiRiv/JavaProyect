@@ -27,6 +27,7 @@ public class InvoiceService {
         return repository.findById(id);
     }
 
+
     public void deleteById(UUID id) {
         Optional<Invoice> invoice = repository.findById(id);
         if (invoice.isPresent()) {

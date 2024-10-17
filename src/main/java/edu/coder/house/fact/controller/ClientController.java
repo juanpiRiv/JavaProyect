@@ -3,6 +3,8 @@ package edu.coder.house.fact.controller;
 
 import edu.coder.house.fact.entity.Client;
 import edu.coder.house.fact.service.ClientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +24,24 @@ public class ClientController {
         this.service = service;
     }
 
-
+    @Operation(summary = "Get all clients")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Iterable<Client>> getAll() {
         Iterable<Client> clients = service.getClient();
         return ResponseEntity.ok(clients);
     }
 
-
+    @Operation(summary = "Get by id client")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Optional<Client>> getById(@PathVariable UUID id) {
         Optional<Client> client = service.getById(id);
@@ -40,8 +52,13 @@ public class ClientController {
         }
     }
 
-
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Create Client")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "409", description = "Conflict")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Client> create(@RequestBody Client client) {
         try {
             Client newClient = service.save(client);
@@ -51,8 +68,13 @@ public class ClientController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-    @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Update Client")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "409", description = "Conflict")
+    @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Client> update(@PathVariable UUID id, @RequestBody Client updatedClient) {
         Optional<Client> existingClient = service.getById(id);
         if (existingClient.isPresent()) {
@@ -64,7 +86,12 @@ public class ClientController {
         }
     }
 
-
+    @Operation(summary = "Delete client")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "404", description = "Not Found")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         try {

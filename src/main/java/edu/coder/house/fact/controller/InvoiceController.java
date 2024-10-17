@@ -4,6 +4,7 @@ import edu.coder.house.fact.entity.Invoice;
 import edu.coder.house.fact.entity.InvoiceItem;
 import edu.coder.house.fact.service.InvoiceItemService;
 import edu.coder.house.fact.service.InvoiceService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +24,7 @@ public class InvoiceController {
 
     @Autowired
     private InvoiceItemService invoiceItemService;
-
+    @Operation(summary = "Create Invoice")
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Invoice> create(@RequestBody Invoice invoice) {
         try {
@@ -34,13 +35,13 @@ public class InvoiceController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
+    @Operation(summary = "Get all invoices")
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Iterable<Invoice>> getAll() {
         Iterable<Invoice> invoices = invoiceService.getAllInvoices();
         return ResponseEntity.ok(invoices);
     }
-
+    @Operation(summary = "Get by id invoice")
     @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Optional<Invoice>> getById(@PathVariable UUID id) {
         Optional<Invoice> invoice = invoiceService.getById(id);
@@ -50,7 +51,7 @@ public class InvoiceController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @Operation(summary = "Add items to invoice")
     @PostMapping("/{invoiceId}/items")
     public ResponseEntity<?> addItemsToInvoice(@PathVariable UUID invoiceId, @RequestBody List<InvoiceItem> items) {
         Optional<Invoice> invoice = invoiceService.getById(invoiceId);

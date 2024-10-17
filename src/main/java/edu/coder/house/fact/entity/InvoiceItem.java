@@ -42,6 +42,7 @@ public class InvoiceItem {
     @Column(nullable = false)
     private Double subtotal;
 
+
     public InvoiceItem(Invoice invoice, Product product, Integer quantity, Double price) {
         this.invoice = invoice;
         this.product = product;
@@ -64,15 +65,17 @@ public class InvoiceItem {
         this.subtotal = calculateSubtotal();
     }
 
+
     public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
     public double getSubtotal() {
-        return subtotal;
+        return this.subtotal;
     }
 
     public Integer getQuantity() {
@@ -88,6 +91,7 @@ public class InvoiceItem {
     }
 
     public void setProduct(Product product) {
+        this.product = product;
     }
 }
 

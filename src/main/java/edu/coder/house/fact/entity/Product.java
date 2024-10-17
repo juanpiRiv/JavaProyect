@@ -41,7 +41,7 @@ public class Product {
     }
 
     public Double getPrice() {
-        return price;
+        return this.price;
     }
 
     public Long getId() {

@@ -1,5 +1,6 @@
 package edu.coder.house.fact.service;
 
+import edu.coder.house.fact.entity.Invoice;
 import edu.coder.house.fact.entity.InvoiceItem;
 import edu.coder.house.fact.repository.InvoiceItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ public class InvoiceItemService {
     }
     public List<InvoiceItem> findByInvoiceId(UUID invoiceId) {
         return repository.findByInvoiceId(invoiceId);
-
 }
 
     public void deleteById(UUID id) {
