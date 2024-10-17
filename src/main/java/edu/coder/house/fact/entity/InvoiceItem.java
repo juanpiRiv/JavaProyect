@@ -1,19 +1,26 @@
 package edu.coder.house.fact.entity;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "invoice_item")
+import java.util.UUID;
+
 @Getter
 @Setter
-@NoArgsConstructor // Constructor sin argumentos para JPA
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "invoice_item")
 public class InvoiceItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "invoice_id", nullable = false)
@@ -23,36 +30,64 @@ public class InvoiceItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @NotNull
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
+    @NotNull
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
+    @NotNull
     @Column(nullable = false)
-    private double subtotal;
+    private Double subtotal;
 
-    public void calcularSubtotal() {
-        this.subtotal = this.quantity * this.price;
-    }
-
-    public void setQuantity(int quantity) {
+    public InvoiceItem(Invoice invoice, Product product, Integer quantity, Double price) {
+        this.invoice = invoice;
+        this.product = product;
         this.quantity = quantity;
-        calcularSubtotal();
-    }
-
-    public void setPrice(double price) {
         this.price = price;
-        calcularSubtotal();
+        this.subtotal = calculateSubtotal();
     }
 
+    public Double calculateSubtotal() {
+        return this.price * this.quantity;
+    }
 
-    public double getSubtotal() {
-        return this.subtotal;
+    public void setPrice(Double price) {
+        this.price = price;
+        this.subtotal = calculateSubtotal();
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+        this.subtotal = calculateSubtotal();
     }
 
     public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public double getSubtotal() {
+        return subtotal;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setSubtotal(double i) {
+        this.subtotal= (double) i;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+    }
 }
+

@@ -13,25 +13,26 @@ import java.util.UUID;
 public class InvoiceService {
 
     @Autowired
-    private InvoiceRepository invoiceRepository;
-
+    private InvoiceRepository repository;
 
     public Invoice save(Invoice invoice) {
-        invoice.calcularTotal();
-        return invoiceRepository.save(invoice);
+        return repository.save(invoice);
     }
 
-
-    public List<Invoice> getInvoices() {
-        return invoiceRepository.findAll();
+    public List<Invoice> getAllInvoices() {
+        return repository.findAll();
     }
 
     public Optional<Invoice> getById(UUID id) {
-        return invoiceRepository.findById(id);
+        return repository.findById(id);
     }
 
-
     public void deleteById(UUID id) {
-        invoiceRepository.deleteById(id);
+        Optional<Invoice> invoice = repository.findById(id);
+        if (invoice.isPresent()) {
+            repository.deleteById(id);
+        } else {
+            throw new RuntimeException("Factura no encontrada con ID: " + id);
+        }
     }
 }

@@ -2,14 +2,19 @@ package edu.coder.house.fact.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "product")
-@NoArgsConstructor
-@Getter @Setter
 public class Product {
 
     @Id
@@ -33,5 +38,13 @@ public class Product {
         this.description = description;
         this.price = price;
         this.stock = stock;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

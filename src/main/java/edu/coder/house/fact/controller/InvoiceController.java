@@ -1,10 +1,8 @@
 package edu.coder.house.fact.controller;
 
-
-import edu.coder.house.fact.entity.Client;
 import edu.coder.house.fact.entity.Invoice;
 import edu.coder.house.fact.entity.InvoiceItem;
-import edu.coder.house.fact.service.ClientService;
+import edu.coder.house.fact.service.InvoiceItemService;
 import edu.coder.house.fact.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,81 +15,55 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/invoices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/api/invoices")
 public class InvoiceController {
 
     @Autowired
     private InvoiceService invoiceService;
 
     @Autowired
-    private ClientService clientService;
+    private InvoiceItemService invoiceItemService;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<?> createInvoice(@RequestBody Invoice invoice) {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Invoice> create(@RequestBody Invoice invoice) {
         try {
-            // Verificar si el cliente existe utilizando el ID desde el objeto cliente
-            if (invoice.getClient() == null || invoice.getClient().getId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Client information is missing.");
-            }
-
-            // Busca al cliente utilizando su ID
-            Optional<Client> clientOptional = clientService.findById(invoice.getClient().getId());
-
-            if (clientOptional.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client not found");
-            }
-
-            // Establecer el cliente en la factura usando el objeto Client directamente
-            invoice.setClient(clientOptional.get());
-
-            for (InvoiceItem item : invoice.getItems()) {
-                item.setInvoice(invoice); // Establecer la relación entre el item y la factura
-            }
-
-            invoice.calcularTotal(); // Asegúrate de que este método calcule el total correctamente
-            Invoice newInvoice = invoiceService.save(invoice); // Guarda la nueva factura
-            return new ResponseEntity<>(newInvoice, HttpStatus.CREATED);
+            Invoice newInvoice = invoiceService.save(invoice);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newInvoice);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing request: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-
-    @GetMapping
-    public ResponseEntity<List<Invoice>> getAllInvoices() {
-        List<Invoice> invoices = invoiceService.getInvoices();
-        return new ResponseEntity<>(invoices, HttpStatus.OK);
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Iterable<Invoice>> getAll() {
+        Iterable<Invoice> invoices = invoiceService.getAllInvoices();
+        return ResponseEntity.ok(invoices);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Invoice> getInvoiceById(@PathVariable UUID id) {
+    @GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Optional<Invoice>> getById(@PathVariable UUID id) {
         Optional<Invoice> invoice = invoiceService.getById(id);
-        return invoice.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Invoice> updateInvoice(@PathVariable UUID id, @RequestBody Invoice invoice) {
-        Optional<Invoice> existingInvoice = invoiceService.getById(id);
-        if (existingInvoice.isEmpty()) {
+        if (invoice.isPresent()) {
+            return ResponseEntity.ok(invoice);
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        invoice.setId(id);
-        invoice.setClient(existingInvoice.get().getClient());
-        Invoice updatedInvoice = invoiceService.save(invoice);
-        return ResponseEntity.ok(updatedInvoice);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInvoiceById(@PathVariable UUID id) {
-        try {
-            invoiceService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PostMapping("/{invoiceId}/items")
+    public ResponseEntity<?> addItemsToInvoice(@PathVariable UUID invoiceId, @RequestBody List<InvoiceItem> items) {
+        Optional<Invoice> invoice = invoiceService.getById(invoiceId);
+        if (!invoice.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invoice not found");
         }
+
+        for (InvoiceItem item : items) {
+            item.setInvoice(invoice.get());
+            invoiceItemService.save(item);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Items added successfully");
     }
 }
 

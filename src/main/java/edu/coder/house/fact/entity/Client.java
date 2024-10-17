@@ -1,25 +1,26 @@
 package edu.coder.house.fact.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "client")
 public class Client {
-    public Client() {
-    }
-
     public Client(UUID id) {
         this.id = id;
     }
 
     public void setId(UUID id) {
         this.id = id;
-    }//añado el set manual
+    }
 
     public Client(String dni, String name, String lastname, String mail, String telefono) {
         this.dni = dni;
