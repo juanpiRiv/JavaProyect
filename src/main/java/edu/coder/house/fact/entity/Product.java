@@ -1,6 +1,5 @@
 package edu.coder.house.fact.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

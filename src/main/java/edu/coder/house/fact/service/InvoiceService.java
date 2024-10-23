@@ -1,6 +1,7 @@
 package edu.coder.house.fact.service;
 
 import edu.coder.house.fact.entity.Invoice;
+import edu.coder.house.fact.entity.InvoiceItem;
 import edu.coder.house.fact.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class InvoiceService {
         return repository.findById(id);
     }
 
+    public List<Invoice> saveAll(Iterable<Invoice> invoices) {
+        return repository.saveAll(invoices);
+    }
 
     public void deleteById(UUID id) {
         Optional<Invoice> invoice = repository.findById(id);
@@ -36,4 +40,5 @@ public class InvoiceService {
             throw new RuntimeException("Factura no encontrada con ID: " + id);
         }
     }
+
 }

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,11 +33,13 @@ public class Invoice {
     @Column(nullable = false)
     private LocalDateTime date;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "invoice", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<InvoiceItem> items = new ArrayList<>();; // Inicializar la lista
 
     @Column(nullable = false)
     private Double totalAmount;
+
 
     public Invoice(Client client, LocalDateTime date, Double totalAmount) {
         this.client = client;
@@ -43,12 +47,17 @@ public class Invoice {
         this.totalAmount = totalAmount;
         this.items = new ArrayList<>();
     }
+
+    public void clearItems() {
+        this.items.clear();
+        this.totalAmount = 0.0;
+    }
+
     public void addItem(InvoiceItem item) {
         items.add(item);
         item.setInvoice(this);
         totalAmount += item.getSubtotal();
     }
-
 
     public void removeItem(InvoiceItem item) {
         items.remove(item);
@@ -56,15 +65,16 @@ public class Invoice {
         totalAmount -= item.getSubtotal();
     }
 
-
     public void calculateTotal() {
         totalAmount = items.stream()
                 .mapToDouble(InvoiceItem::getSubtotal)
                 .sum();
     }
+
     public void setId(UUID id) {
         this.id = id;
     }
+
     public Client getClient() {
         return client;
     }
@@ -75,5 +85,10 @@ public class Invoice {
 
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+
+    public UUID getId() {
+       return id;
     }
 }
